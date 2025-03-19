@@ -1,0 +1,868 @@
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #ff6b6b;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px;
+            gap: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .editor-section, .preview-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .editor-section h2, .preview-section h2 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            overflow: visible; /* 确保不限制子元素的溢出行为 */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        /* Style tabs */
+        .style-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: flex-start; /* 改为左对齐 */
+        }
+
+        .style-tab {
+            flex: 0 0 calc(33.33% - 10px); /* 改为固定宽度，每行3个 */
+            width: calc(33.33% - 10px); /* 确保宽度计算正确 */
+            padding: 15px 5px;
+            text-align: center;
+            background-color: #f5f5f5;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            min-height: 80px; /* 确保高度统一 */
+        }
+
+        .style-tab:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .style-tab.active {
+            border-color: var(--primary-color);
+            background-color: rgba(74, 107, 255, 0.1);
+            font-weight: bold;
+        }
+
+        /* 移除不再需要的图标样式 */
+        .style-tab-icon {
+            display: none;
+        }
+
+        /* 保持工具栏固定 */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f5f5f5;
+            border-radius: 6px 6px 0 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid #ddd;
+            padding: 8px;
+            display: flex; /* 使用flex布局 */
+            justify-content: space-between; /* 均匀分布工具组 */
+            align-items: center; /* 垂直居中 */
+            flex-wrap: wrap; /* 允许在小屏幕上换行 */
+            gap: 8px; /* 组之间的间距 */
+        }
+
+        .toolbar button {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toolbar button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .toolbar button.active {
+            background-color: #e6f0ff;
+            border-color: #4a6bff;
+            color: #4a6bff;
+        }
+
+        .toolbar .color-picker, .toolbar .bg-color-picker {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+        }
+
+        .font-size-select {
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        /* 修改编辑器样式，确保滚动条显示 */
+        #editor {
+            width: 100%;
+            min-height: 200px;
+            max-height: 300px; /* 减小最大高度，使滚动条更容易出现 */
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            outline: none;
+            overflow-y: auto !important; /* 使用!important确保属性不被覆盖 */
+            background-color: white;
+            display: block; /* 确保元素是块级元素 */
+        }
+
+        .preview-card {
+            width: 100%;
+            max-width: 500px; /* Default max-width */
+            min-height: 300px;
+            position: relative;
+            transition: all 0.3s ease;
+            margin: 0 auto; /* Center the card */
+        }
+
+        /* Minimalist Style */
+        .minimalist {
+            background-color: white;
+            color: #292929;
+            border: 4px solid #4a6bff; /* 固定蓝色边框 */
+            border-radius: 0; /* 方形卡片 */
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            position: relative; /* 确保能添加顶部装饰 */
+        }
+
+        /* 添加极简风格的顶部红色装饰 */
+        .minimalist::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #ff6b6b; /* 红色顶部装饰 */
+            z-index: 1;
+        }
+
+        /* Enhanced Holographic Style - Updated */
+        .holographic {
+            background: #314659; /* 修改为固定的深蓝色背景 */
+            color: #292929;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2),
+                0 0 15px rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .holographic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, 
+                #ff0000, 
+                #ff9900, 
+                #ffff00, 
+                #33cc33, 
+                #3399ff, 
+                #9933ff, 
+                #ff00ff);
+            z-index: 1;
+        }
+
+        .holographic .card-title {
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .holographic .card-content {
+            background-color: rgba(255, 255, 255, 0.75); /* 更浅、更透明的白色背景 */
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #9933ff; /* 保持紫色边框不变 */
+        }
+
+        .holographic .card-content::before {
+            display: none; /* 移除原有的渐变边框 */
+        }
+
+        .holographic .card-watermark {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .card-content {
+            margin-bottom: 20px;
+        }
+
+        /* Image styling in the card content */
+        .card-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 6px;
+        }
+
+        .card-watermark {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+            }
+            
+            .editor-section, .preview-section {
+                width: 100%;
+            }
+
+            .style-tab {
+                flex: 0 0 calc(50% - 10px); /* 小屏幕上每行2个 */
+                width: calc(50% - 10px);
+            }
+			
+			.contact-bar {
+				font-size: 0.8rem;
+				padding: 6px 12px;
+    }
+        }
+
+        /* 调整工具组样式 */
+        .toolbar-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            flex-wrap: nowrap; /* 确保工具组内的按钮不换行 */
+        }
+
+        .align-group button {
+            width: 36px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 6px 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .file-label:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Editor image styling */
+        #editor img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+
+        /* Tooltip for format painter */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Preview controls */
+        .preview-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .preview-controls button {
+            flex: 1;
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .preview-controls button:hover {
+            background-color: #e9ecef;
+        }
+
+        .preview-controls button i {
+            font-size: 14px;
+        }
+
+        .card-size-info {
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        /* 新波普艺术风格 (Neopop) */
+        .neopop {
+            background-color: #fff;
+            border: 3px solid #000;
+            border-radius: 0; /* 方形卡片 */
+            padding: 25px;
+            position: relative;
+            box-shadow: 8px 8px 0 #000;
+            transform: translate(-4px, -4px);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: visible; /* 允许内容溢出边界，以便显示完整圆形 */
+        }
+
+        /* 调整棋盘格装饰 - 解决位置和尺寸问题 */
+        .neopop .checkerboard-decoration {
+            position: absolute;
+            top: 0; /* 严格置顶，确保没有白边 */
+            left: 0;
+            right: 0;
+            height: 45px; /* 设定高度为3个方格的高度 */
+            display: flex;
+            flex-direction: column;
+            z-index: 0; /* 降低z-index让标题在上层 */
+            overflow: hidden;
+        }
+
+        .neopop .checkerboard-row {
+            display: flex;
+            height: 15px;
+        }
+
+        .neopop .checker-square {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .neopop .checker-square.pink {
+            background-color: #FF61D8;
+        }
+
+        .neopop .checker-square.white {
+            background-color: white;
+        }
+
+        .neopop::after {
+            content: "";
+            position: absolute;
+            bottom: 60px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            background-color: #4BE3AC; /* 绿色装饰 */
+            border-radius: 50%;
+            z-index: 3; /* 提高z-index，确保在内容上方 */
+        }
+
+        .neopop:hover {
+            transform: translate(-8px, -8px);
+            box-shadow: 12px 12px 0 #000;
+        }
+
+        /* 确保标题在上层 */
+        .neopop .card-title {
+            position: relative; /* 确保定位上下文 */
+            z-index: 2; /* 提高z-index，确保在棋盘格上方 */
+            color: #000;
+            font-weight: 800;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            padding: 5px 10px;
+            background-color: #56CCF2; /* 蓝色背景 */
+            display: inline-block;
+            border: 3px solid #000;
+        }
+
+        .neopop .card-content {
+            background-color: #FBD348; /* 黄色背景 */
+            color: #292929;
+            border: 3px solid #000;
+            padding: 20px;
+            margin: 20px 0 30px; /* 增加上下边距，为圆形留出空间 */
+            box-shadow: 5px 5px 0 #000;
+            position: relative;
+            z-index: 1;
+            overflow: visible; /* 允许圆形突出内容区域 */
+        }
+
+        /* 需要通过JavaScript添加网格背景元素 */
+        .neopop .grid-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+            background-size: 15px 15px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 修改圆形装饰的位置，确保一半在内一半在外 */
+        .neopop .card-content::before {
+            content: "";
+            position: absolute;
+            left: 15px;
+            top: -15px; /* 向上偏移，使一半在外 */
+            width: 30px;
+            height: 30px;
+            background-color: #ff6b6b;
+            border: 3px solid #000;
+            border-radius: 50%;
+            z-index: 2; /* 确保在网格背景上方 */
+        }
+
+        .neopop .card-content::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            bottom: -15px; /* 向下偏移，使一半在外 */
+            width: 30px;
+            height: 30px;
+            background-color: #4a6bff;
+            border: 3px solid #000;
+            border-radius: 50%;
+            z-index: 2; /* 确保在网格背景上方 */
+        }
+
+        .neopop .card-watermark {
+            color: #555;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        /* 暗黑科技风格 (Darktech) */
+        .darktech {
+            background-color: #0a0a0a;
+            border: 1px solid #30cfd0;
+            border-radius: 8px;
+            padding: 25px;
+            position: relative;
+            box-shadow: 0 0 15px rgba(48, 207, 208, 0.5);
+            overflow: hidden;
+        }
+
+        .darktech::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(90deg, #0a0a0a 20px, transparent 1%) center,
+                linear-gradient(#0a0a0a 20px, transparent 1%) center,
+                rgba(48, 207, 208, 0.1);
+            background-size: 22px 22px;
+            z-index: 0;
+        }
+
+        .darktech .card-title {
+            color: #30cfd0;
+            font-weight: 600;
+            margin-bottom: 25px;
+            position: relative;
+            text-shadow: 0 0 10px rgba(48, 207, 208, 0.7);
+            font-family: 'Courier New', monospace;
+            padding-left: 15px;
+            border-left: 3px solid #30cfd0;
+            z-index: 1;
+        }
+
+        .darktech .card-content {
+            background-color: rgba(10, 10, 10, 0.8);
+            border: 1px solid #30cfd0;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 10px 0 20px;
+            color: #ffffff;
+            position: relative;
+            z-index: 1;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 10px rgba(48, 207, 208, 0.3);
+        }
+
+        .darktech .card-watermark {
+            color: #30cfd0;
+            font-family: 'Courier New', monospace;
+            opacity: 0.5;
+        }
+
+        /* 赛博朋克风格 (Cyberpunk) */
+        .cyberpunk {
+            background: linear-gradient(135deg, #0b0b2a 0%, #1a1a3a 100%);
+            color: #00fffc;
+            border: none; /* 移除原有边框 */
+            border-radius: 5px;
+            padding: 25px;
+            position: relative;
+            overflow: visible; /* 修改为visible允许边框效果溢出 */
+        }
+
+        /* 外层发光边框 */
+        .cyberpunk::after {
+            content: "";
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 4px solid rgba(255, 0, 255, 0.5);
+            border-radius: 9px;
+            filter: blur(3px);
+            z-index: 0; /* 修改为0 */
+            pointer-events: none;
+        }
+
+        /* 内层发光边框 */
+        .cyberpunk::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background-image: 
+                linear-gradient(rgba(255, 0, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            border: 2px solid rgba(0, 255, 252, 0.8);
+            border-radius: 7px;
+            filter: blur(2px);
+            z-index: 1; /* 修改为1 */
+            pointer-events: none;
+        }
+
+        /* 确保内容在最上层 */
+        .cyberpunk .card-title,
+        .cyberpunk .card-content,
+        .cyberpunk .card-watermark,
+        .cyberpunk .circuit-lines {
+            position: relative;
+            z-index: 2; /* 所有内容元素的z-index设为2，确保在边框上方 */
+        }
+
+        .cyberpunk .card-title {
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+            font-family: 'Arial', sans-serif;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            border-left: 3px solid #00fffc;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+
+        .cyberpunk .card-content {
+            background-color: rgba(10, 10, 43, 0.7);
+            border: 1px solid #00fffc;
+            border-radius: 5px;
+            padding: 20px;
+            color: #00fffc;
+            text-shadow: 0 0 5px rgba(0, 255, 252, 0.7);
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 10px rgba(0, 255, 252, 0.3);
+        }
+
+        .cyberpunk .card-watermark {
+            color: #ff00ff;
+            opacity: 0.7;
+            text-shadow: 0 0 5px #ff00ff;
+            position: absolute; /* 从relative改为absolute */
+            bottom: 10px;
+            right: 10px; /* 确保在右下角 */
+        }
+
+        .cyberpunk .circuit-lines {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 100px;
+            height: 50px;
+            border-bottom: 2px solid #00fffc;
+            border-left: 2px solid #00fffc;
+            z-index: 0;
+            opacity: 0.7;
+        }
+
+        /* 蒸汽波风格 (Vaporwave) */
+        .vaporwave {
+            background: linear-gradient(to bottom, #c774e8 0%, #94a6fe 100%);
+            color: white;
+            border: 4px solid #0ff;
+            border-radius: 0;
+            box-shadow: 0 0 0 2px #ff71ce, 0 0 25px rgba(0, 255, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            padding: 25px;
+        }
+
+        .vaporwave::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                transparent 0%, #0ff 10%, 
+                #ff71ce 30%, transparent 40%, 
+                #0ff 60%, #ff71ce 80%, 
+                transparent 100%);
+            z-index: 1;
+        }
+
+        .vaporwave::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                transparent 0%, #0ff 10%, 
+                #ff71ce 30%, transparent 40%, 
+                #0ff 60%, #ff71ce 80%, 
+                transparent 100%);
+            z-index: 1;
+        }
+
+        .vaporwave .card-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 3px 3px 0 #ff71ce, 6px 6px 0 #01cdfe;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 2;
+        }
+
+        .vaporwave .card-content {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid #01cdfe;
+            padding: 20px;
+            position: relative;
+            text-shadow: 1px 1px 0 #01cdfe;
+            z-index: 2;
+            margin-bottom: 20px;
+        }
+
+        .vaporwave .card-watermark {
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            opacity: 0.7;
+            text-shadow: 2px 2px 0 #ff71ce;
+            font-style: italic;
+            z-index: 2;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .vaporwave .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .vaporwave .digital-time {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            color: #fff;
+            background: rgba(1, 205, 254, 0.2);
+            padding: 5px 10px;
+            border: 1px solid #01cdfe;
+            z-index: 2;
+        }
+
+        .vaporwave .card-decoration {
+            position: absolute;
+            bottom: 60px;
+            right: 25px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff71ce, #ff71ce 50%, #01cdfe 50%, #01cdfe);
+            z-index: 1;
+            box-shadow: 0 0 15px rgba(1, 205, 254, 0.5);
+        }
+		
+		#busuanzi_container_site_pv {
+          font-size: 14px;
+          color: #A47864;
+        }
+		
+		#busuanzi_container_site_uv {
+          font-size: 14px;
+          color: #A47864;
+        }
+	    
+		.contact-bar {
+		  font-size: 14px;
+          color: #A47864;
+		}
+		
